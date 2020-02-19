@@ -1,0 +1,27 @@
+{
+	"name": "react-native-app-utils",
+	"version": "0.1.0",
+	"description": "",
+	"nativePackage": true,
+	"main": "index.js",
+	"author": "Johnathon Weaver",
+	"homepage": "https://github.com/stumbleapp/react-native-app-utils",
+	"license": "MIT",
+	"keywords": [
+		"react native",
+		"utils",
+		"wake lock",
+		"screen lock",
+		"picture in picture"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/stumbleapp/react-native-app-utils.git"
+	},
+	"bugs": {
+		"url": "https://github.com/stumbleapp/react-native-app-utils/issues"
+	},
+	"devDependencies": {
+		"react-native": ">=0.57.5"
+	}
+}

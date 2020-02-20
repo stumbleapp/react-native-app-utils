@@ -163,6 +163,10 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 			return;
 		}
 
+        if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.N ) {
+			return;
+	    }
+
         activity.enterPictureInPictureMode();
     }
 

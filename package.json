@@ -1,7 +1,7 @@
 {
 	"name": "react-native-app-utils",
-	"version": "0.1.0",
-	"description": "",
+	"version": "0.1.1",
+	"description": "A simple React-Native utils library with useful functions.",
 	"nativePackage": true,
 	"main": "index.js",
 	"author": "Johnathon Weaver",

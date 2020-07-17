@@ -7,7 +7,7 @@ const UtilsModule = NativeModules.UtilsModule;
 function startApp() { return UtilsModule.startApp(); };
 function moveAppToBack() { return UtilsModule.moveAppToBack(); };
 function acquireWakelock() { return UtilsModule.acquireWakelock(); };
-function releaseWakeLock() { return UtilsModule.releaseWakeLock(); };
+function releaseWakelock() { return UtilsModule.releaseWakelock(); };
 function acquirePartialWakelock() { return UtilsModule.acquirePartialWakelock(); };
 function releasePartialWakelock() { return UtilsModule.releasePartialWakelock(); };
 function aquireScreenLock() { return UtilsModule.aquireScreenLock(); };
@@ -20,7 +20,7 @@ export default {
 	startApp: startApp,
 	moveAppToBack: moveAppToBack,
 	acquireWakelock: acquireWakelock,
-	releaseWakeLock: releaseWakeLock,
+	releaseWakelock: releaseWakelock,
 	acquirePartialWakelock: acquirePartialWakelock,
 	releasePartialWakelock: releasePartialWakelock,
 	aquireScreenLock: aquireScreenLock,

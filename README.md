@@ -4,7 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/react-native-app-utils.svg?maxAge=2592000)](https://img.shields.io/npm/dm/react-native-app-utils.svg?maxAge=2592000)
 
 A simple React-Native utils library with useful functions.  
-Currently only supporting Android.
+Currently only supporting Android 4.1+, iOS might come later.  
 
 ## Quick Start:
 In a lot of cases if you are using the latest version of React Native then you should be able to run one of the preferred package install methods and immediately get going.
@@ -68,7 +68,7 @@ Utils.moveAppToBack();
 If for any reason you want to keep the screen on while your app is running then you can use wake locks and screen locks. Make sure to release them if having the screen on isn't always a requirement of using your app, think about the battery usage! The first wake lock function should cause the screen to switch on, otherwise you can mix and match, try using a screen lock aswell. Last but not least you can use partial wake locks if you need the device to be alive while doing background work.
 ```javascript
 Utils.acquireWakelock();
-Utils.releaseWakeLock();
+Utils.releaseWakelock();
 
 Utils.acquirePartialWakelock();
 Utils.releasePartialWakelock();

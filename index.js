@@ -20,7 +20,7 @@ export default {
 	startApp: startApp,
 	moveAppToBack: moveAppToBack,
 	acquireWakelock: acquireWakelock,
-	releaseWakeLock: releaseWakeLock,
+	releaseWakelock: releaseWakelock,
 	acquirePartialWakelock: acquirePartialWakelock,
 	releasePartialWakelock: releasePartialWakelock,
 	aquireScreenLock: aquireScreenLock,

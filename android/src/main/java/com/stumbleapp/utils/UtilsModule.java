@@ -156,7 +156,7 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void releaseWakelock() {
+	public void releaseWakeLock() {
 		if ( !wakeLock.isHeld() ) {
 			return;
 		}

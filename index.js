@@ -10,9 +10,9 @@ function acquireWakelock() { return UtilsModule.acquireWakelock(); };
 function releaseWakeLock() { return UtilsModule.releaseWakeLock(); };
 function acquirePartialWakelock() { return UtilsModule.acquirePartialWakelock(); };
 function releasePartialWakelock() { return UtilsModule.releasePartialWakelock(); };
-function aquireScreenLock() { return UtilsModule.aquireScreenLock(); };
+function acquireScreenLock() { return UtilsModule.acquireScreenLock(); };
 function releaseScreenLock() { return UtilsModule.releaseScreenLock(); };
-function aquireWifiLock() { return UtilsModule.aquireWifiLock(); };
+function acquireWifiLock() { return UtilsModule.acquireWifiLock(); };
 function releaseWifiLock() { return UtilsModule.releaseWifiLock(); };
 function enterPictureInPictureMode() { return UtilsModule.enterPictureInPictureMode(); };
 
@@ -23,9 +23,9 @@ export default {
 	releaseWakeLock: releaseWakeLock,
 	acquirePartialWakelock: acquirePartialWakelock,
 	releasePartialWakelock: releasePartialWakelock,
-	aquireScreenLock: aquireScreenLock,
+	acquireScreenLock: acquireScreenLock,
 	releaseScreenLock: releaseScreenLock,
-	aquireWifiLock: aquireWifiLock,
+	acquireWifiLock: acquireWifiLock,
 	releaseWifiLock: releaseWifiLock,
 	enterPictureInPictureMode: enterPictureInPictureMode
 };

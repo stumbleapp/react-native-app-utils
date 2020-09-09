@@ -147,7 +147,7 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void acquireWakelock() {
+	public void acquireWakeLock() {
 		if ( wakeLock.isHeld() ) {
 			return;
 		}
@@ -165,7 +165,7 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void acquirePartialWakelock() {
+	public void acquirePartialWakeLock() {
 		if ( partialWakeLock.isHeld() ) {
 			return;
 		}
@@ -174,7 +174,7 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void releasePartialWakelock() {
+	public void releasePartialWakeLock() {
 		if ( !partialWakeLock.isHeld() ) {
 			return;
 		}

@@ -6,10 +6,10 @@ const UtilsModule = NativeModules.UtilsModule;
 
 function startApp() { return UtilsModule.startApp(); };
 function moveAppToBack() { return UtilsModule.moveAppToBack(); };
-function acquireWakelock() { return UtilsModule.acquireWakelock(); };
-function releaseWakelock() { return UtilsModule.releaseWakelock(); };
-function acquirePartialWakelock() { return UtilsModule.acquirePartialWakelock(); };
-function releasePartialWakelock() { return UtilsModule.releasePartialWakelock(); };
+function acquireWakeLock() { return UtilsModule.acquireWakeLock(); };
+function releaseWakeLock() { return UtilsModule.releaseWakeLock(); };
+function acquirePartialWakeLock() { return UtilsModule.acquirePartialWakeLock(); };
+function releasePartialWakeLock() { return UtilsModule.releasePartialWakeLock(); };
 function acquireScreenLock() { return UtilsModule.acquireScreenLock(); };
 function releaseScreenLock() { return UtilsModule.releaseScreenLock(); };
 function acquireWifiLock() { return UtilsModule.acquireWifiLock(); };
@@ -19,10 +19,10 @@ function enterPictureInPictureMode() { return UtilsModule.enterPictureInPictureM
 export default {
 	startApp: startApp,
 	moveAppToBack: moveAppToBack,
-	acquireWakelock: acquireWakelock,
-	releaseWakelock: releaseWakelock,
-	acquirePartialWakelock: acquirePartialWakelock,
-	releasePartialWakelock: releasePartialWakelock,
+	acquireWakeLock: acquireWakeLock,
+	releaseWakeLock: releaseWakeLock,
+	acquirePartialWakeLock: acquirePartialWakeLock,
+	releasePartialWakeLock: releasePartialWakeLock,
 	acquireScreenLock: acquireScreenLock,
 	releaseScreenLock: releaseScreenLock,
 	acquireWifiLock: acquireWifiLock,

@@ -11,6 +11,7 @@ import android.content.Context;
 import android.annotation.TargetApi;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.KeyguardManager;
 import android.os.Build;
 
 import android.os.PowerManager;
@@ -194,6 +195,10 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 			try {
 				activity.setTurnScreenOn( true );
 				activity.setShowWhenLocked( true );
+
+				ReactApplicationContext reactContext = getReactApplicationContext();
+				KeyguardManager keyguardManager = (KeyguardManager) reactContext.getSystemService( Context.KEYGUARD_SERVICE );
+				keyguardManager.requestDismissKeyguard( activity, null );
 			} catch ( NoSuchMethodError e ) {
 				e.printStackTrace();
 			}

@@ -256,11 +256,11 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 
 	@ReactMethod
 	public void releaseWifiLock() {
-		if ( wifiLock.isHeld() ) {
+		if ( !wifiLock.isHeld() ) {
 			return;
 		}
 
-		wifiLock.acquire();
+		wifiLock.release();
 	}
 
 	@TargetApi( Build.VERSION_CODES.N )

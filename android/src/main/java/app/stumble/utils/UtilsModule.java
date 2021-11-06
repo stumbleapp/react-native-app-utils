@@ -1,65 +1,149 @@
-package com.stumbleapp.utils;
+package app.stumble.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.Runnable;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Rational;
+
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Context;
+
+import android.view.WindowManager.LayoutParams;
+
 import android.annotation.TargetApi;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.KeyguardManager;
-import android.os.Build;
 
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.app.KeyguardManager;
+import android.app.RemoteAction;
+import android.app.PictureInPictureParams;
+
+import android.os.Build;
+import android.os.Bundle;
 import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
+
 import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.WifiLock;
-import android.view.WindowManager.LayoutParams;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.UiThreadUtil;
 
-public class UtilsModule extends ReactContextBaseJavaModule {
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-	private final WakeLock wakeLock;
-	private final WakeLock partialWakeLock;
-	private final WifiLock wifiLock;
+public class UtilsModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
-	private int deprecatedFlags = LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+	private final PowerManager.WakeLock wakeLock;
+	private final PowerManager.WakeLock partialWakeLock;
+	private final WifiManager.WifiLock wifiLock;
+
+	private final int screenFlags = LayoutParams.FLAG_SHOW_WHEN_LOCKED |
 		LayoutParams.FLAG_DISMISS_KEYGUARD |
 		LayoutParams.FLAG_KEEP_SCREEN_ON |
 		LayoutParams.FLAG_TURN_SCREEN_ON;
 
-	private int launchFlags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
+	private final int launchFlags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
 		Intent.FLAG_ACTIVITY_CLEAR_TOP |
 		Intent.FLAG_ACTIVITY_SINGLE_TOP |
 		Intent.FLAG_ACTIVITY_NEW_TASK;
 
+	private boolean autoEnterPictureInPicture = false;
+
+	private String PIP_INTENT_ID = "app.stumble.utils.PIPEvent";
+
 	public UtilsModule( ReactApplicationContext reactContext ) {
 		super( reactContext );
+
+		reactContext.addLifecycleEventListener( this );
 
 		ignoreSpecialBatteryFeatures( reactContext );
 
 		PowerManager powerManager = (PowerManager) reactContext.getSystemService( Context.POWER_SERVICE );
-		wakeLock = powerManager.newWakeLock( PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "rn-utils:wakelock" );
+		wakeLock = powerManager.newWakeLock( PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "rn-apputils:wakelock" );
 		wakeLock.setReferenceCounted( false );
-		partialWakeLock = powerManager.newWakeLock( PowerManager.PARTIAL_WAKE_LOCK, "rn-utils:partialwakelock" );
+		partialWakeLock = powerManager.newWakeLock( PowerManager.PARTIAL_WAKE_LOCK, "rn-apputils:partialwakelock" );
 		partialWakeLock.setReferenceCounted( false );
 
 		WifiManager wifiManager = (WifiManager) reactContext.getSystemService( Context.WIFI_SERVICE );
-		wifiLock = wifiManager.createWifiLock( WifiManager.WIFI_MODE_FULL_HIGH_PERF, "rn-utils:wifilock" );
+		wifiLock = wifiManager.createWifiLock( WifiManager.WIFI_MODE_FULL, "rn-apputils:wifilock" );
 		wifiLock.setReferenceCounted( false );
+
+		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.O ) {
+			return;
+		}
+
+		IntentFilter mInstancePIPIntentFilter = new IntentFilter( PIP_INTENT_ID );
+		BroadcastReceiver mInstancePIPIntentReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive( Context context, Intent intent ) {
+				final Activity activity = getCurrentActivity();
+
+				if ( activity == null ) {
+					return;
+				}
+
+				Bundle extras = intent.getExtras();
+				WritableMap params = Arguments.createMap();
+				params.putString( "id", extras.getString( "id" ) );
+
+				ReactApplicationContext reactContext = getReactApplicationContext();
+				reactContext.getJSModule( DeviceEventManagerModule.RCTDeviceEventEmitter.class ).emit( "rn-apputils:pipevent_" + extras.getString( "id" ), null );
+
+				if ( !isOrderedBroadcast() ) {
+					return;
+				}
+
+				setResultCode( activity.RESULT_OK );
+			}
+		};
+
+		reactContext.registerReceiver( mInstancePIPIntentReceiver, mInstancePIPIntentFilter );
 	}
 
 	@Override
 	public String getName() {
 		return "UtilsModule";
+	}
+
+	@Override
+	public void onHostResume() {
+
+	}
+
+	@Override
+	public void onHostPause() {
+		if ( !autoEnterPictureInPicture ) {
+			return;
+		};
+
+		final Activity activity = getCurrentActivity();
+
+		if ( activity == null ) {
+			return;
+		}
+
+		if ( activity.isInPictureInPictureMode() ) {
+			return;
+		}
+
+		activity.enterPictureInPictureMode();
+	}
+
+	@Override
+	public void onHostDestroy() {
+
 	}
 
 	private static void ignoreSpecialBatteryFeatures( ReactApplicationContext reactContext ) {
@@ -128,7 +212,17 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void startApp() {
+	public void addListener( String eventName ) {
+		// Keep: Required for RN built in Event Emitter Calls.
+	}
+
+	@ReactMethod
+	public void removeListeners( Integer count ) {
+		// Keep: Required for RN built in Event Emitter Calls.
+	}
+
+	@ReactMethod
+	public void startActivity() {
 		ReactApplicationContext reactContext = getReactApplicationContext();
 		Intent launchIntent = new Intent( reactContext, getMainActivityClass( reactContext ) );
 		launchIntent.addFlags( launchFlags );
@@ -137,7 +231,7 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void moveAppToBack() {
+	public void moveActivityToBack() {
 		final Activity activity = getCurrentActivity();
 
 		if ( activity == null ) {
@@ -191,7 +285,7 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 			return;
 		}
 
-		if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 ) {
+	//	if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 ) {
 			try {
 				activity.setTurnScreenOn( true );
 				activity.setShowWhenLocked( true );
@@ -203,14 +297,14 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 				e.printStackTrace();
 			}
 
-			return;
-		}
+	//		return;
+	//	}
 
 		UiThreadUtil.runOnUiThread(
 			new Runnable() {
 				@Override
 				public void run() {
-					activity.getWindow().addFlags( deprecatedFlags );
+					activity.getWindow().addFlags( screenFlags );
 				}
 			}
 		);
@@ -224,7 +318,7 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 			return;
 		}
 
-		if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 ) {
+	//	if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 ) {
 			try {
 				activity.setTurnScreenOn( false );
 				activity.setShowWhenLocked( false );
@@ -232,14 +326,14 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 				e.printStackTrace();
 			}
 
-			return;
-		}
+	//		return;
+	//	}
 
 		UiThreadUtil.runOnUiThread(
 			new Runnable() {
 				@Override
 				public void run() {
-					activity.getWindow().clearFlags( deprecatedFlags );
+					activity.getWindow().clearFlags( screenFlags );
 				}
 			}
 		);
@@ -263,19 +357,113 @@ public class UtilsModule extends ReactContextBaseJavaModule {
 		wifiLock.release();
 	}
 
-	@TargetApi( Build.VERSION_CODES.N )
+	@TargetApi( Build.VERSION_CODES.O )
 	@ReactMethod
-	public void enterPictureInPictureMode() {
+	public void setPictureInPictureAspectRatio( int width, int height ) {
+		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.O ) {
+			return;
+		}
+
 		final Activity activity = getCurrentActivity();
 
 		if ( activity == null ) {
 			return;
 		}
 
+		Rational aspectRatio = new Rational( width, height );
+
+		PictureInPictureParams params = new PictureInPictureParams.Builder()
+			.setAspectRatio( aspectRatio )
+			.build();
+
+		activity.setPictureInPictureParams( params );
+	}
+
+	@TargetApi( Build.VERSION_CODES.N )
+	@ReactMethod
+	public void togglePictureInPictureAutoEnter() {
 		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.N ) {
 			return;
 		}
 
+		autoEnterPictureInPicture = !autoEnterPictureInPicture;
+	}
+
+	@TargetApi( Build.VERSION_CODES.O )
+	@ReactMethod
+	public void setPictureInPictureActions( ReadableArray actions ) {
+		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.O ) {
+			return;
+		}
+
+		final Activity activity = getCurrentActivity();
+
+		if ( activity == null ) {
+			return;
+		}
+
+		ReactApplicationContext reactContext = getReactApplicationContext();
+		List<RemoteAction> remoteActions = new ArrayList<>();
+
+		for ( int i = 0, size = actions.size(); i < size; i++ ) {
+			ReadableMap actionItem = actions.getMap( i );
+
+			Intent actionIntent = new Intent( PIP_INTENT_ID );
+			actionIntent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+			actionIntent.putExtra( "id", actionItem.getString( "id" ) );
+
+			RemoteAction remoteAction = new RemoteAction(
+				DrawableUtils.iconFromUri( reactContext, actionItem.getString( "icon" ) ),
+				actionItem.getString( "title" ),
+				actionItem.getString( "desc" ),
+				PendingIntent.getBroadcast( reactContext, i, actionIntent, PendingIntent.FLAG_CANCEL_CURRENT )
+			);
+
+			remoteActions.add( remoteAction );
+		}
+
+		PictureInPictureParams params = new PictureInPictureParams.Builder()
+			.setActions( remoteActions )
+			.build();
+
+		activity.setPictureInPictureParams( params );
+	}
+
+	@TargetApi( Build.VERSION_CODES.N )
+	@ReactMethod
+	public void enterPictureInPictureMode() {
+		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.N ) {
+			return;
+		}
+
+		final Activity activity = getCurrentActivity();
+
+		if ( activity == null ) {
+			return;
+		}
+
+		if ( activity.isInPictureInPictureMode() ) {
+			return;
+		}
+
 		activity.enterPictureInPictureMode();
+	}
+
+	@TargetApi( Build.VERSION_CODES.N )
+	@ReactMethod
+	public void exitPictureInPictureMode() {
+		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.N ) {
+			return;
+		}
+
+		final Activity activity = getCurrentActivity();
+
+		if ( activity == null ) {
+			return;
+		}
+
+		if ( !activity.isInPictureInPictureMode() ) {
+			return;
+		}
 	}
 }

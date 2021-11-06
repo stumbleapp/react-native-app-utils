@@ -1,9 +1,9 @@
 {
 	"name": "react-native-app-utils",
-	"version": "0.1.7",
-	"description": "A simple React-Native utils library with useful functions.",
+	"version": "0.2.0",
+	"description": "A simple React Native utils library with useful functions.",
 	"nativePackage": true,
-	"main": "index.js",
+	"main": "src/index.js",
 	"author": "Johnathon Weaver",
 	"homepage": "https://github.com/stumbleapp/react-native-app-utils",
 	"license": "MIT",
@@ -13,7 +13,8 @@
 		"wake lock",
 		"wifi lock",
 		"screen lock",
-		"picture in picture"
+		"picture in picture",
+		"secure view"
 	],
 	"repository": {
 		"type": "git",
@@ -22,7 +23,7 @@
 	"bugs": {
 		"url": "https://github.com/stumbleapp/react-native-app-utils/issues"
 	},
-	"devDependencies": {
-		"react-native": ">=0.57.5"
+	"peerDependencies": {
+		"react-native": ">=0.60.0"
 	}
 }

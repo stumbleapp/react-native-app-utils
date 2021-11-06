@@ -448,22 +448,4 @@ public class UtilsModule extends ReactContextBaseJavaModule implements Lifecycle
 
 		activity.enterPictureInPictureMode();
 	}
-
-	@TargetApi( Build.VERSION_CODES.N )
-	@ReactMethod
-	public void exitPictureInPictureMode() {
-		if ( Build.VERSION.SDK_INT < Build.VERSION_CODES.N ) {
-			return;
-		}
-
-		final Activity activity = getCurrentActivity();
-
-		if ( activity == null ) {
-			return;
-		}
-
-		if ( !activity.isInPictureInPictureMode() ) {
-			return;
-		}
-	}
 }

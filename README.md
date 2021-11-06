@@ -126,7 +126,8 @@ ScreenLock.acquire();
 ScreenLock.release();
 ```
 
-This is an **experimental feature implementation** that hasn't been fully tested and finalised yet. We will be looking to improve or add more functionality in the future.
+This is an **experimental feature implementation** that hasn't been fully tested and finalised yet. We will be looking to improve and/or add more functionality in the future.
+For starters this will allow you to adjust the size of the Picture in Picture window, good for changing between landscape and portrait. We will be looking to implement some automated solution for that scenario.
 
 ```javascript
 // Android API 26+
@@ -141,22 +142,22 @@ PictureInPicture.toggleAutoEnter();
 ```
 
 Here are 3 different ways you can import icons ready for use with actions.
-**Make sure the icons are 24dp x 24dp or you will experience issues, all icons are rendered white as default.**
+**Make sure the icons are 24dp x 24dp or you will experience issues, all icons are rendered white as default.**  
 
 ```javascript
-// Font Icon
+// Feathers Font Icon
 import Icon from 'react-native-vector-icons/dist/Feather';
-let camera = Icon.getImageSource( 'camera', 24 );
+const camera = Icon.getImageSource( 'camera', 24 );
 
-// Image Icon
+// Image
 import { Image } from 'react-native';
-let mic = Image.resolveAssetSource( require( './assets/images/mic.png' )  );
+const mic = Image.resolveAssetSource( require( './assets/images/mic.png' )  );
 
-// Font Icon
-let phone = 'font://Feather/phone/24';
+// Font URI
+const phone = 'font://Feather/phone/24';
 ```
 
-Here is an example of how to use Picture in Picture actions. In future we do plan to simplify and give more fine grained control over editing existing actions rather than replacing them each time, maybe even better event handling?
+Here is an example of how to use Picture in Picture actions. In future we do plan to simplify and give more fine grained control over editing existing actions rather than replacing them each time. Maybe even better event handling? **Make sure not to use spaces or weird characters for action ids.**
 
 ```javascript
 // Android API 26+

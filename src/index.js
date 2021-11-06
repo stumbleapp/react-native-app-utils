@@ -64,7 +64,7 @@ function setPictureInPictureActions( actions: Actions ) {
 };
 
 function enterPictureInPictureMode() { return UtilsModule.enterPictureInPictureMode(); };
-function exitPictureInPictureMode() { return UtilsModule.exitPictureInPictureMode(); };
+function exitPictureInPictureMode() { return UtilsModule.startActivity(); };
 
 export const PictureInPicture = {
 	setAspectRatio: setPictureInPictureAspectRatio,
